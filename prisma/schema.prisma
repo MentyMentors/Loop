@@ -1,0 +1,81 @@
+// ============================================================================
+// Menty Game Lounge — Standalone Prisma Schema
+//
+// This schema targets a dedicated, isolated Neon PostgreSQL instance that is
+// entirely separate from the main mentorship platform's database. The `User`
+// model here is NOT a source of truth — it is a local replica/cache of
+// profile attributes synchronized on-demand from the main app's session
+// (see src/services/lounge-user.ts). Never write auth/credential data here.
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  // Points at the isolated Neon instance for THIS app only.
+  // Must never be the same connection string as the main mentorship platform.
+  url      = env("LOUNGE_DATABASE_URL")
+}
+
+// ----------------------------------------------------------------------------
+// User — local replica cache of the main app's authenticated user.
+// `id` mirrors the UUID primary key from the main mentorship platform's
+// database so that foreign keys in this schema remain stable across syncs.
+// ----------------------------------------------------------------------------
+model User {
+  /// UUID of the user in the main mentorship platform's database.
+  id        String   @id
+  name      String
+  email     String   @unique
+  role      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  posts Post[]
+  likes Like[]
+
+  @@index([email])
+  @@map("users")
+}
+
+// ----------------------------------------------------------------------------
+// Post — an X-style microblog entry in the engineering feed.
+// ----------------------------------------------------------------------------
+model Post {
+  id        String   @id @default(cuid())
+  /// Hard cap enforced both here (DB comment/documentation) and in the
+  /// application layer (see lounge-user.ts / server actions) at 280 chars.
+  content   String   @db.VarChar(280)
+  authorId  String   @map("author_id")
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  likes Like[]
+
+  @@index([authorId])
+  @@index([createdAt])
+  @@map("posts")
+}
+
+// ----------------------------------------------------------------------------
+// Like — a single user's like on a single post. The compound unique
+// constraint on [postId, userId] makes duplicate likes structurally
+// impossible at the database level, independent of application logic.
+// ----------------------------------------------------------------------------
+model Like {
+  id        String   @id @default(cuid())
+  postId    String   @map("post_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId], name: "unique_post_like_per_user")
+  @@index([postId])
+  @@index([userId])
+  @@map("likes")
+}
