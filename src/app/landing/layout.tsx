@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Menty Game Lounge",
+  title: "LOOP - A product of Menty",
   description:
-    "A public game hub and a members-only engineering community feed for Menty.",
+    "A public game hub and a members-only community feed for Menty.",
 };
 
 export default function RootLayout({

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import type { SessionUserAttributes } from "@/services/auth";
 
-interface EngineeringFeedComponentProps {
+interface LoopFeedComponentProps {
   currentUser: SessionUserAttributes;
 }
 
@@ -18,9 +18,9 @@ interface EngineeringFeedComponentProps {
  * platform's database) and is only ever rendered after a valid session
  * token has been decoded and the user replica has been synced.
  */
-export default async function EngineeringFeedComponent({
+export default async function LoopFeedComponent({
   currentUser,
-}: EngineeringFeedComponentProps): Promise<React.ReactElement> {
+}: LoopFeedComponentProps): Promise<React.ReactElement> {
   const posts = await prisma.post.findMany({
     orderBy: { createdAt: "desc" },
     take: 50,
@@ -38,7 +38,7 @@ export default async function EngineeringFeedComponent({
     <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-10">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
-          Engineering Feed
+          Loop Feed
         </h1>
         <p className="text-sm text-muted-foreground">
           Welcome back, {currentUser.name}. Posts are visible to all
@@ -51,7 +51,7 @@ export default async function EngineeringFeedComponent({
           <CardHeader>
             <CardTitle className="text-lg">No posts yet</CardTitle>
             <CardDescription>
-              Be the first to post something in the engineering feed.
+              Be the first to post something in loop.
             </CardDescription>
           </CardHeader>
         </Card>

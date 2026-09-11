@@ -1,5 +1,5 @@
 // ============================================================================
-// Menty Game Lounge — Standalone Prisma Schema
+// Loop — Standalone Prisma Schema
 //
 // This schema targets a dedicated, isolated Neon PostgreSQL instance that is
 // entirely separate from the main mentorship platform's database. The `User`

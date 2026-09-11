@@ -14,7 +14,7 @@ import {
   SESSION_COOKIE_NAME_DEV,
 } from "@/services/auth";
 import { syncLoungeUser } from "@/services/lounge-user";
-import EngineeringFeedComponent from "@/components/EngineeringFeedComponent";
+import EngineeringFeedComponent from "@/components/feed/loopfeed";
 
 export const dynamic = "force-dynamic";
 
